@@ -1,13 +1,13 @@
-package br.com.univille.das;
+package br.com.sistemas.chamados;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DasApplication {
+public class ChamadosApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DasApplication.class, args);
+		SpringApplication.run(ChamadosApplication.class, args);
 	}
 
 }
