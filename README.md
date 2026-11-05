@@ -67,6 +67,7 @@ Os endpoints recebem e retornam JSON. Para testar manualmente, use uma ferrament
 | Técnicos | `GET/POST /tecnicos`, `GET/PUT/DELETE /tecnicos/{id}` |
 | Chamados | `GET/POST /chamados`, `GET/PUT/DELETE /chamados/{id}` |
 | Ações de chamados | `PATCH /chamados/{id}/atribuir`, `PATCH /chamados/{id}/status` |
+| Comentários | `POST /chamados/{id}/comentarios` |
 | Chamados de um cliente | `GET /clientes/{id}/chamados` |
 
 Para criar um registro, envie um `POST` com `Content-Type: application/json`. Exemplo de corpo para criar um cliente:
@@ -114,6 +115,19 @@ Para alterar o status, envie `PATCH /chamados/{id}/status`:
 
 Os status aceitos são `ABERTO`, `EM_ATENDIMENTO`, `AGUARDANDO_CLIENTE` e `FECHADO`. Ao fechar, a data de fechamento é preenchida. Chamados fechados não podem ser alterados nem receber atribuição de técnico.
 
+### Comentários e histórico do chamado
+
+Envie um `POST /chamados/{id}/comentarios` para registrar uma interação. O texto e o autor são obrigatórios, e a data é preenchida automaticamente:
+
+```json
+{
+  "texto": "Estou analisando o problema.",
+  "autor": "Técnico"
+}
+```
+
+Os comentários são listados em ordem de data no detalhe retornado por `GET /chamados/{id}`, no campo `comentarios`.
+
 ## Filtros, paginação e ordenação
 
 `GET /chamados` permite combinar os filtros opcionais `status`, `prioridade` e `clienteId`. Também aceita os parâmetros de paginação `page` (começa em zero), `size` e `sort`.
@@ -126,3 +140,7 @@ GET /clientes/1/chamados?page=0&size=10&sort=dataAbertura,desc
 ```
 
 A paginação padrão retorna 10 itens por página, ordenados por data de abertura decrescente. Prioridades aceitas: `BAIXA`, `MEDIA`, `ALTA` e `CRITICA`.
+
+## Testes automatizados
+
+`.\mvnw.cmd test` executa todos os testes, incluindo testes de persistência com `@DataJpaTest`, testes de controller com `@WebMvcTest` e testes de integração com MockMvc e H2. Eles cobrem criação, validação, duplicidade, respostas 404, filtros e comentários.
