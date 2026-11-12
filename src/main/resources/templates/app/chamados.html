@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chamados | DeskFlow</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="app-shell">
+    <header th:replace="~{app/fragments :: header('Chamados', 'chamados')}"></header>
+    <main class="page">
+        <div class="page-heading">
+            <div><p class="eyebrow">ATENDIMENTO</p><h1>Chamados</h1>
+                <p class="subtitle">Consulte e filtre as solicitações de suporte.</p></div>
+            <a class="button button-primary" th:href="@{/app/chamados/novo}">＋ Abrir chamado</a>
+        </div>
+        <section class="panel">
+            <form class="filter-bar" method="get" th:action="@{/app/chamados}">
+                <label>Status
+                    <select name="status">
+                        <option value="">Todos os status</option>
+                        <option th:each="opcao : ${statusOpcoes}" th:value="${opcao}" th:selected="${opcao == statusSelecionado}"
+                                th:text="${#strings.replace(opcao.toString(), '_', ' ')}">ABERTO</option>
+                    </select>
+                </label>
+                <label>Prioridade
+                    <select name="prioridade">
+                        <option value="">Todas as prioridades</option>
+                        <option th:each="opcao : ${prioridadeOpcoes}" th:value="${opcao}" th:selected="${opcao == prioridadeSelecionada}"
+                                th:text="${opcao}">ALTA</option>
+                    </select>
+                </label>
+                <label>Cliente
+                    <select name="clienteId">
+                        <option value="">Todos os clientes</option>
+                        <option th:each="cliente : ${clientes}" th:value="${cliente.id}" th:selected="${cliente.id == clienteSelecionado}"
+                                th:text="${cliente.nome}">Cliente</option>
+                    </select>
+                </label>
+                <button class="button button-secondary" type="submit">Filtrar</button>
+                <a class="button button-quiet" th:href="@{/app/chamados}">Limpar</a>
+            </form>
+
+            <div class="table-wrap" th:if="${!chamados.content.isEmpty()}">
+                <table>
+                    <thead><tr><th>Chamado</th><th>Cliente</th><th>Categoria</th><th>Prioridade</th><th>Status</th><th>Abertura</th></tr></thead>
+                    <tbody>
+                    <tr th:each="chamado : ${chamados.content}">
+                        <td><a class="ticket-title" th:href="@{/app/chamados/{id}(id=${chamado.id})}">
+                            <span class="ticket-id" th:text="|#${chamado.id}|">#1</span>
+                            <span th:text="${chamado.titulo}">Título do chamado</span>
+                        </a></td>
+                        <td th:text="${clientesPorId[chamado.clienteId]?.nome ?: 'Cliente removido'}">Cliente</td>
+                        <td th:text="${categoriasPorId[chamado.categoriaId]?.nome ?: 'Categoria removida'}">Categoria</td>
+                        <td><span class="priority" th:classappend="| priority-${#strings.toLowerCase(chamado.prioridade.toString())}|"
+                                  th:text="${#strings.replace(chamado.prioridade.toString(), '_', ' ')}">ALTA</span></td>
+                        <td><span class="status" th:classappend="| status-${#strings.toLowerCase(chamado.status.toString())}|"
+                                  th:text="${#strings.replace(chamado.status.toString(), '_', ' ')}">ABERTO</span></td>
+                        <td class="muted" th:text="${#temporals.format(chamado.dataAbertura, 'dd/MM/yyyy HH:mm')}">12/11/2026</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-state" th:if="${chamados.content.isEmpty()}">
+                <div class="empty-icon">⌕</div><h3>Nenhum chamado encontrado</h3>
+                <p>Tente alterar os filtros ou abra um novo chamado.</p>
+                <a class="button button-primary" th:href="@{/app/chamados/novo}">Abrir chamado</a>
+            </div>
+            <div class="pagination" th:if="${chamados.totalPages > 1}">
+                <span th:text="|Página ${chamados.number + 1} de ${chamados.totalPages}|">Página 1</span>
+                <div class="pagination-actions">
+                    <a class="button button-quiet" th:if="${chamados.hasPrevious()}"
+                       th:href="@{/app/chamados(page=${chamados.number - 1},status=${statusSelecionado},prioridade=${prioridadeSelecionada},clienteId=${clienteSelecionado})}">← Anterior</a>
+                    <a class="button button-quiet" th:if="${chamados.hasNext()}"
+                       th:href="@{/app/chamados(page=${chamados.number + 1},status=${statusSelecionado},prioridade=${prioridadeSelecionada},clienteId=${clienteSelecionado})}">Próxima →</a>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

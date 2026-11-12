@@ -1,6 +1,6 @@
 # Sistema de Chamados
 
-API REST para cadastro e acompanhamento de chamados, clientes, categorias e técnicos, desenvolvida com Java e Spring Boot.
+Sistema para cadastro e acompanhamento de chamados, clientes, categorias e técnicos, desenvolvido com Java, Spring Boot e Thymeleaf.
 
 ## Requisitos
 
@@ -25,7 +25,18 @@ Clone o repositório e entre na pasta do projeto. Em seguida, inicie a aplicaç�
 ./mvnw spring-boot:run
 ```
 
-Quando o Spring Boot indicar que iniciou, a API estará disponível em `http://localhost:8080`.
+Quando o Spring Boot indicar que iniciou, a interface estará disponível em `http://localhost:8080` (ou `http://localhost:8080/app`). A API REST continua disponível nos endpoints descritos abaixo.
+
+## Interface web
+
+A interface server-rendered usa Thymeleaf e permite:
+
+- acompanhar o painel e filtrar chamados por status, prioridade e cliente;
+- abrir chamados e consultar seus detalhes;
+- atualizar o status, atribuir um técnico e registrar comentários;
+- cadastrar clientes, categorias e técnicos em **Cadastros**.
+
+As páginas da interface ficam em `/app`; os endpoints JSON existentes permanecem disponíveis sem alteração.
 
 Para encerrar, use `Ctrl+C` no terminal em que a aplicação está rodando.
 

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="topbar" th:fragment="header(titulo, ativo)">
+    <a class="brand" th:href="@{/app}">
+        <span class="brand-mark">D</span>
+        <span>Desk<span class="brand-light">Flow</span></span>
+    </a>
+    <nav class="main-nav" aria-label="Navegação principal">
+        <a th:href="@{/app}" th:classappend="${ativo == 'painel'} ? ' active'">Visão geral</a>
+        <a th:href="@{/app/chamados}" th:classappend="${ativo == 'chamados'} ? ' active'">Chamados</a>
+        <a th:href="@{/app/cadastros}" th:classappend="${ativo == 'cadastros'} ? ' active'">Cadastros</a>
+    </nav>
+    <a class="top-action" th:href="@{/app/chamados/novo}"><span aria-hidden="true">+</span> Novo chamado</a>
+</header>
+</body>
+</html>

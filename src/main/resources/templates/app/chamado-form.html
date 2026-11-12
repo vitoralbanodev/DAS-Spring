@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Novo chamado | DeskFlow</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="app-shell">
+    <header th:replace="~{app/fragments :: header('Novo chamado', 'chamados')}"></header>
+    <main class="page page-narrow">
+        <a class="back-link" th:href="@{/app/chamados}">← Voltar aos chamados</a>
+        <div class="page-heading compact-heading">
+            <div><p class="eyebrow">NOVA SOLICITAÇÃO</p><h1>Abrir chamado</h1>
+                <p class="subtitle">Descreva o problema para que a equipe possa ajudar.</p></div>
+        </div>
+        <div class="alert alert-error" th:if="${erro}" th:text="${erro}"></div>
+        <div class="alert alert-info" th:if="${#lists.isEmpty(clientes) or #lists.isEmpty(categorias)}">
+            Antes de abrir um chamado, cadastre ao menos um cliente e uma categoria.
+            <a th:href="@{/app/cadastros}">Ir para cadastros</a>
+        </div>
+        <section class="panel form-panel">
+            <form method="post" th:action="@{/app/chamados}" th:object="${chamado}">
+                <div class="form-errors" th:if="${#fields.hasErrors('*')}">
+                    <p th:each="error : ${#fields.errors('*')}" th:text="${error}">Campo obrigatório</p>
+                </div>
+                <div class="field">
+                    <label for="titulo">Título <span class="required">*</span></label>
+                    <input id="titulo" type="text" th:field="*{titulo}" maxlength="150" placeholder="Ex.: Computador não inicia">
+                    <small>Até 150 caracteres.</small>
+                </div>
+                <div class="field">
+                    <label for="descricao">Descrição <span class="required">*</span></label>
+                    <textarea id="descricao" th:field="*{descricao}" rows="5" maxlength="2000"
+                              placeholder="Conte o que aconteceu e quais passos já tentou."></textarea>
+                    <small>Até 2000 caracteres.</small>
+                </div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="prioridade">Prioridade <span class="required">*</span></label>
+                        <select id="prioridade" th:field="*{prioridade}">
+                            <option value="">Selecione</option>
+                            <option th:each="opcao : ${prioridadeOpcoes}" th:value="${opcao}" th:text="${opcao}">ALTA</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="clienteId">Cliente <span class="required">*</span></label>
+                        <select id="clienteId" th:field="*{clienteId}">
+                            <option value="">Selecione</option>
+                            <option th:each="cliente : ${clientes}" th:value="${cliente.id}" th:text="|${cliente.nome} (${cliente.email})|">Cliente</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="categoriaId">Categoria <span class="required">*</span></label>
+                        <select id="categoriaId" th:field="*{categoriaId}">
+                            <option value="">Selecione</option>
+                            <option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nome}">Categoria</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="tecnicoId">Técnico responsável</label>
+                        <select id="tecnicoId" th:field="*{tecnicoId}">
+                            <option value="">Sem atribuição</option>
+                            <option th:each="tecnico : ${tecnicos}" th:value="${tecnico.id}" th:text="${tecnico.nome}">Técnico</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <a class="button button-quiet" th:href="@{/app/chamados}">Cancelar</a>
+                    <button class="button button-primary" type="submit"
+                            th:disabled="${#lists.isEmpty(clientes) or #lists.isEmpty(categorias)}">Criar chamado</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>

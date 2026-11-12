@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${'Chamado #' + chamado.id + ' | DeskFlow'}">Chamado | DeskFlow</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="app-shell">
+    <header th:replace="~{app/fragments :: header('Detalhe do chamado', 'chamados')}"></header>
+    <main class="page">
+        <a class="back-link" th:href="@{/app/chamados}">← Voltar aos chamados</a>
+        <div class="alert alert-success" th:if="${sucesso}" th:text="${sucesso}"></div>
+        <div class="alert alert-error" th:if="${erro}" th:text="${erro}"></div>
+        <div class="detail-heading">
+            <div>
+                <p class="eyebrow" th:text="|CHAMADO #${chamado.id}|">CHAMADO #1</p>
+                <h1 th:text="${chamado.titulo}">Título do chamado</h1>
+                <div class="detail-badges">
+                    <span class="status" th:classappend="| status-${#strings.toLowerCase(chamado.status.toString())}|"
+                          th:text="${#strings.replace(chamado.status.toString(), '_', ' ')}">ABERTO</span>
+                    <span class="priority" th:classappend="| priority-${#strings.toLowerCase(chamado.prioridade.toString())}|"
+                          th:text="|Prioridade ${#strings.toLowerCase(chamado.prioridade.toString())}|">Prioridade alta</span>
+                </div>
+            </div>
+            <span class="muted" th:text="|Aberto em ${#temporals.format(chamado.dataAbertura, 'dd/MM/yyyy HH:mm')}|">Aberto em</span>
+        </div>
+        <div class="detail-layout">
+            <div class="detail-main">
+                <section class="panel">
+                    <div class="section-heading"><div><h2>Descrição</h2><p>Detalhes informados na abertura</p></div></div>
+                    <p class="description-text" th:text="${chamado.descricao}">Descrição do chamado.</p>
+                </section>
+                <section class="panel">
+                    <div class="section-heading"><div><h2>Conversa</h2><p>Histórico de interações do chamado</p></div></div>
+                    <div class="comment-list" th:if="${!#lists.isEmpty(chamado.comentarios)}">
+                        <article class="comment" th:each="comentario : ${chamado.comentarios}">
+                            <div class="comment-top"><strong th:text="${comentario.autor}">Autor</strong>
+                                <time class="muted" th:text="${#temporals.format(comentario.data, 'dd/MM/yyyy HH:mm')}">12/11/2026</time></div>
+                            <p th:text="${comentario.texto}">Comentário</p>
+                        </article>
+                    </div>
+                    <div class="empty-inline" th:if="${#lists.isEmpty(chamado.comentarios)}">Ainda não há comentários neste chamado.</div>
+                    <form class="comment-form" method="post" th:action="@{/app/chamados/{id}/comentarios(id=${chamado.id})}" th:object="${comentario}">
+                        <div class="form-errors" th:if="${#fields.hasErrors('*')}">
+                            <p th:each="error : ${#fields.errors('*')}" th:text="${error}">Campo obrigatório</p>
+                        </div>
+                        <div class="form-grid">
+                            <div class="field"><label for="autor">Seu nome</label><input id="autor" th:field="*{autor}" maxlength="100" placeholder="Nome do autor"></div>
+                            <div class="field"><label for="texto">Adicionar comentário</label><textarea id="texto" th:field="*{texto}" rows="3" maxlength="2000" placeholder="Escreva uma atualização..."></textarea></div>
+                        </div>
+                        <button class="button button-primary" type="submit">Enviar comentário</button>
+                    </form>
+                </section>
+            </div>
+            <aside class="detail-aside">
+                <section class="panel">
+                    <div class="section-heading"><div><h2>Informações</h2></div></div>
+                    <dl class="info-list">
+                        <div><dt>Cliente</dt><dd th:text="${clientesPorId[chamado.clienteId]?.nome ?: 'Cliente removido'}">Cliente</dd></div>
+                        <div><dt>Categoria</dt><dd th:text="${categoriasPorId[chamado.categoriaId]?.nome ?: 'Categoria removida'}">Categoria</dd></div>
+                        <div><dt>Técnico</dt><dd th:text="${chamado.tecnicoId == null ? 'Não atribuído' : tecnicosPorId[chamado.tecnicoId]?.nome ?: 'Técnico removido'}">Técnico</dd></div>
+                        <div th:if="${chamado.dataFechamento != null}"><dt>Fechado em</dt><dd th:text="${#temporals.format(chamado.dataFechamento, 'dd/MM/yyyy HH:mm')}">12/11/2026</dd></div>
+                    </dl>
+                </section>
+                <section class="panel" th:if="${chamado.status.toString() != 'FECHADO'}">
+                    <div class="section-heading"><div><h2>Gerenciar</h2><p>Atualize o andamento</p></div></div>
+                    <form class="stack-form" method="post" th:action="@{/app/chamados/{id}/status(id=${chamado.id})}">
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option th:each="opcao : ${statusOpcoes}" th:value="${opcao}" th:selected="${opcao == chamado.status}"
+                                    th:text="${#strings.replace(opcao.toString(), '_', ' ')}">ABERTO</option>
+                        </select>
+                        <button class="button button-secondary button-full" type="submit">Atualizar status</button>
+                    </form>
+                    <form class="stack-form" method="post" th:action="@{/app/chamados/{id}/tecnico(id=${chamado.id})}">
+                        <label for="tecnicoId">Técnico responsável</label>
+                        <select id="tecnicoId" name="tecnicoId" required>
+                            <option value="">Selecione um técnico</option>
+                            <option th:each="tecnico : ${tecnicosPorId.values()}" th:value="${tecnico.id}"
+                                    th:selected="${tecnico.id == chamado.tecnicoId}" th:text="${tecnico.nome}">Técnico</option>
+                        </select>
+                        <button class="button button-secondary button-full" type="submit" th:disabled="${#maps.isEmpty(tecnicosPorId)}">Atribuir técnico</button>
+                        <a class="small-link" th:if="${#maps.isEmpty(tecnicosPorId)}" th:href="@{/app/cadastros}">Cadastre um técnico para atribuir.</a>
+                    </form>
+                </section>
+                <div class="closed-note" th:if="${chamado.status.toString() == 'FECHADO'}">
+                    Este chamado está fechado e não pode mais ser alterado.
+                </div>
+            </aside>
+        </div>
+    </main>
+</div>
+</body>
+</html>
