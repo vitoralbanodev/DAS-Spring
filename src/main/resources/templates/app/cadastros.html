@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cadastros | DeskFlow</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="app-shell">
+    <header th:replace="~{app/fragments :: header('Cadastros', 'cadastros')}"></header>
+    <main class="page">
+        <div class="page-heading">
+            <div><p class="eyebrow">CONFIGURAÇÃO</p><h1>Cadastros</h1>
+                <p class="subtitle">Gerencie os dados necessários para abrir e acompanhar chamados.</p></div>
+        </div>
+        <div class="alert alert-success" th:if="${sucesso}" th:text="${sucesso}"></div>
+        <div class="registration-grid">
+            <section class="panel registration-card">
+                <div class="section-heading"><div><h2>Clientes</h2><p th:text="|${#lists.size(clientes)} cadastrados|">0 cadastrados</p></div></div>
+                <form class="stack-form" method="post" th:action="@{/app/cadastros/clientes}" th:object="${novoCliente}">
+                    <div class="form-errors" th:if="${#fields.hasErrors('*')}"><p th:each="error : ${#fields.errors('*')}" th:text="${error}"></p></div>
+                    <div class="alert alert-error" th:if="${erroCliente}" th:text="${erroCliente}"></div>
+                    <label for="clienteNome">Nome</label><input id="clienteNome" th:field="*{nome}" maxlength="100" required>
+                    <label for="clienteEmail">E-mail</label><input id="clienteEmail" type="email" th:field="*{email}" required>
+                    <label for="clienteTelefone">Telefone</label><input id="clienteTelefone" th:field="*{telefone}" maxlength="20">
+                    <button class="button button-secondary button-full" type="submit">Cadastrar cliente</button>
+                </form>
+                <ul class="compact-list" th:if="${!#lists.isEmpty(clientes)}">
+                    <li th:each="cliente : ${clientes}"><strong th:text="${cliente.nome}">Nome</strong><span th:text="${cliente.email}">email</span></li>
+                </ul>
+            </section>
+            <section class="panel registration-card">
+                <div class="section-heading"><div><h2>Categorias</h2><p th:text="|${#lists.size(categorias)} cadastradas|">0 cadastradas</p></div></div>
+                <form class="stack-form" method="post" th:action="@{/app/cadastros/categorias}" th:object="${novaCategoria}">
+                    <div class="form-errors" th:if="${#fields.hasErrors('*')}"><p th:each="error : ${#fields.errors('*')}" th:text="${error}"></p></div>
+                    <div class="alert alert-error" th:if="${erroCategoria}" th:text="${erroCategoria}"></div>
+                    <label for="categoriaNome">Nome</label><input id="categoriaNome" th:field="*{nome}" maxlength="100" required>
+                    <label for="categoriaDescricao">Descrição</label><textarea id="categoriaDescricao" th:field="*{descricao}" rows="3" maxlength="500"></textarea>
+                    <button class="button button-secondary button-full" type="submit">Cadastrar categoria</button>
+                </form>
+                <ul class="compact-list" th:if="${!#lists.isEmpty(categorias)}">
+                    <li th:each="categoria : ${categorias}"><strong th:text="${categoria.nome}">Nome</strong><span th:text="${categoria.descricao}">Descrição</span></li>
+                </ul>
+            </section>
+            <section class="panel registration-card">
+                <div class="section-heading"><div><h2>Técnicos</h2><p th:text="|${#lists.size(tecnicos)} cadastrados|">0 cadastrados</p></div></div>
+                <form class="stack-form" method="post" th:action="@{/app/cadastros/tecnicos}" th:object="${novoTecnico}">
+                    <div class="form-errors" th:if="${#fields.hasErrors('*')}"><p th:each="error : ${#fields.errors('*')}" th:text="${error}"></p></div>
+                    <div class="alert alert-error" th:if="${erroTecnico}" th:text="${erroTecnico}"></div>
+                    <label for="tecnicoNome">Nome</label><input id="tecnicoNome" th:field="*{nome}" maxlength="100" required>
+                    <label for="tecnicoEmail">E-mail</label><input id="tecnicoEmail" type="email" th:field="*{email}" maxlength="254" required>
+                    <label for="perfil">Perfil</label>
+                    <select id="perfil" th:field="*{perfil}">
+                        <option value="">Selecione</option>
+                        <option th:each="perfil : ${perfis}" th:value="${perfil}" th:text="${perfil}">TÉCNICO</option>
+                    </select>
+                    <button class="button button-secondary button-full" type="submit">Cadastrar técnico</button>
+                </form>
+                <ul class="compact-list" th:if="${!#lists.isEmpty(tecnicos)}">
+                    <li th:each="tecnico : ${tecnicos}"><strong th:text="${tecnico.nome}">Nome</strong><span th:text="${tecnico.email}">email</span></li>
+                </ul>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

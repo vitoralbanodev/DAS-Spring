@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Visão geral | DeskFlow</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="app-shell">
+    <header th:replace="~{app/fragments :: header('Visão geral', 'painel')}"></header>
+    <main class="page">
+        <div class="page-heading">
+            <div>
+                <p class="eyebrow">CENTRAL DE SUPORTE</p>
+                <h1>Visão geral</h1>
+                <p class="subtitle">Acompanhe os chamados e mantenha o atendimento em dia.</p>
+            </div>
+            <a class="button button-primary" th:href="@{/app/chamados/novo}">＋ Abrir chamado</a>
+        </div>
+
+        <div class="stats-grid">
+            <a class="stat-card stat-blue" th:href="@{/app/chamados(status='ABERTO')}">
+                <span class="stat-label">Abertos</span><strong th:text="${abertos}">0</strong>
+                <span class="stat-note">Aguardando atendimento</span>
+            </a>
+            <a class="stat-card stat-violet" th:href="@{/app/chamados(status='EM_ATENDIMENTO')}">
+                <span class="stat-label">Em atendimento</span><strong th:text="${emAtendimento}">0</strong>
+                <span class="stat-note">Em andamento pela equipe</span>
+            </a>
+            <a class="stat-card stat-amber" th:href="@{/app/chamados(status='AGUARDANDO_CLIENTE')}">
+                <span class="stat-label">Aguardando cliente</span><strong th:text="${aguardando}">0</strong>
+                <span class="stat-note">Precisam de retorno</span>
+            </a>
+            <a class="stat-card stat-green" th:href="@{/app/chamados(status='FECHADO')}">
+                <span class="stat-label">Fechados</span><strong th:text="${fechados}">0</strong>
+                <span class="stat-note">Concluídos</span>
+            </a>
+        </div>
+
+        <section class="panel">
+            <div class="section-heading">
+                <div><h2>Chamados recentes</h2><p>Últimos registros atualizados</p></div>
+                <a class="text-link" th:href="@{/app/chamados}">Ver todos <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="table-wrap" th:if="${!chamados.content.isEmpty()}">
+                <table>
+                    <thead><tr><th>Chamado</th><th>Cliente</th><th>Prioridade</th><th>Status</th><th>Abertura</th></tr></thead>
+                    <tbody>
+                    <tr th:each="chamado : ${chamados.content}">
+                        <td><a class="ticket-title" th:href="@{/app/chamados/{id}(id=${chamado.id})}">
+                            <span class="ticket-id" th:text="|#${chamado.id}|">#1</span>
+                            <span th:text="${chamado.titulo}">Título do chamado</span>
+                        </a></td>
+                        <td th:text="${clientesPorId[chamado.clienteId]?.nome ?: 'Cliente removido'}">Cliente</td>
+                        <td><span class="priority" th:classappend="| priority-${#strings.toLowerCase(chamado.prioridade.toString())}|"
+                                  th:text="${#strings.replace(chamado.prioridade.toString(), '_', ' ')}">ALTA</span></td>
+                        <td><span class="status" th:classappend="| status-${#strings.toLowerCase(chamado.status.toString())}|"
+                                  th:text="${#strings.replace(chamado.status.toString(), '_', ' ')}">ABERTO</span></td>
+                        <td class="muted" th:text="${#temporals.format(chamado.dataAbertura, 'dd/MM/yyyy HH:mm')}">12/11/2026</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-state" th:if="${chamados.content.isEmpty()}">
+                <div class="empty-icon">✓</div><h3>Nenhum chamado por enquanto</h3>
+                <p>Abra o primeiro chamado para começar a acompanhar os atendimentos.</p>
+                <a class="button button-primary" th:href="@{/app/chamados/novo}">Abrir chamado</a>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
